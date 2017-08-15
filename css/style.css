@@ -121,18 +121,13 @@ figure figcaption p:nth-of-type(3){
 	opacity: 0.5;
 }
 
-.test3 figcaption h2{
-	transform: skewX(90deg);
+.test3 figcaption h2,.test3 figcaption p{
+	transform: skewX(85deg);
+	opacity: 0;
 }
-.test3 figcaption p{
-	transform: skewX(90deg);
-	
-}
-.test3:hover figcaption h2{
+.test3:hover figcaption h2,.test3:hover figcaption p{
 	transform: skewX(0);
-}
-.test3:hover figcaption p{
-	transform: skewX(0);
+	opacity: 1;
 }
 
 .test4{
