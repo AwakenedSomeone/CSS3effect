@@ -151,6 +151,7 @@ figure figcaption p:nth-of-type(3){
 .test4 figcaption div{
 	border: 2px solid #fff;
 	position: absolute;
+	opacity: 0;
 }
 .test4 figcaption .box1{
 	transform: translate(0,350px);
@@ -172,6 +173,7 @@ figure figcaption p:nth-of-type(3){
 }
 .test4:hover figcaption div{
 	transform: translate(0,0);
+	opacity: 1;
 }
 .test4:hover figcaption p,.test4:hover figcaption h2{
 	opacity: 1;
