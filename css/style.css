@@ -167,7 +167,7 @@ figure figcaption p:nth-of-type(3){
 	height:50%;
 	top: 25%;
 	left: 20%;
-	transform: translate(-360px,0);
+	transform: translate(-400px,0);
 	border-left: none;
 	border-right: none;
 }
