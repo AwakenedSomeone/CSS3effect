@@ -1,0 +1,223 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+<style>
+	#canvasa,#canvasb{
+		display: block;
+		border: 1px solid #aaa;
+	}
+	#canvasa{
+		float: left;
+		margin-left: 50px;			
+	}
+	#canvasb{
+		float: right;
+		margin-right: 50px;
+	}
+	.control{
+		position: relative;
+		margin: 0 auto;
+		top:360px;
+		color: #000;
+		height: 30px;
+	}
+	.control a{
+		display: block;
+		padding: 0 10px;
+		height: 30px;
+		line-height: 30px;
+		text-align: center;
+		background-color: antiquewhite;
+		text-decoration: none;
+		color: #000;
+		margin:20px auto;
+		font-size: 18px;
+		width: 60%;
+	}
+	</style>
+</head>
+
+<body>
+<canvas id="canvasa">您的浏览器不支持canvas，请更换浏览器之后再试</canvas>
+<canvas id="canvasb">您的浏览器不支持canvas，请更换浏览器之后再试</canvas>
+<div class="control">
+	<a href="javascript:gray()">gray</a>
+	<a href="javascript:balckAndwhite()">balckAndwhite</a>
+	<a href="javascript:reverse()">reverseEffect</a>
+	<a href="javascript:blur()">blurEffect</a>
+	<a href="javascript:mosaic()">mosaicEffect</a>
+</div>
+
+<script>
+
+	var canvasa=document.getElementById("canvasa");
+	var contexta=canvasa.getContext("2d");
+	
+	var canvasb=document.getElementById("canvasb");
+	var contextb=canvasb.getContext("2d");
+	var image=new Image();
+	window.onload=function(){
+		
+		canvasa.width=500;
+		canvasa.height=300;
+		canvasb.width=500;
+		canvasb.height=300;
+		
+		image.src="images/road.jpg";
+		image.onload=function(){
+			contexta.drawImage(image,0,0,canvasa.width,canvasa.height);
+			
+		};
+	};
+	//灰度滤镜
+	function gray(){
+		var imageData=contexta.getImageData(0,0,canvasa.width,canvasa.height);
+		var pixelData=imageData.data;
+		for(var i=0;i<canvasa.width*canvasa.height;i++)
+			{
+				var r=pixelData[4*i+0];
+				var g=pixelData[4*i+1];
+				var b=pixelData[4*i+2];
+				//根据一个标准计算灰度值
+				var gray=r*0.3+g*0.59+b*0.11;
+				pixelData[4*i+0]=gray;
+				pixelData[4*i+1]=gray;
+				pixelData[4*i+2]=gray;
+			}
+		contextb.putImageData(imageData,0,0,0,0,canvasa.width,canvasa.height);
+	}
+	//黑白滤镜
+	function balckAndwhite(){
+		var imageData=contexta.getImageData(0,0,canvasa.width,canvasa.height);
+		var pixelData=imageData.data;
+		for(var i=0;i<canvasa.width*canvasa.height;i++)
+			{
+				var r=pixelData[4*i+0];
+				var g=pixelData[4*i+1];
+				var b=pixelData[4*i+2];
+				//根据一个标准计算灰度值
+				var gray=r*0.3+g*0.59+b*0.11;
+				var v;
+				if(gray > 255/2)
+					{
+						v=255;
+					}
+				else
+					{
+						v=gray;
+					}
+				pixelData[4*i+0]=v;
+				pixelData[4*i+1]=v;
+				pixelData[4*i+2]=v;
+			}
+		contextb.putImageData(imageData,0,0,0,0,canvasa.width,canvasa.height);
+	}
+	//反色滤镜（底片样式）
+	function reverse(){
+		var imageData=contexta.getImageData(0,0,canvasa.width,canvasa.height);
+		var pixelData=imageData.data;
+		for(var i=0;i<canvasa.width*canvasa.height;i++)
+			{
+				var r=255-pixelData[4*i+0];
+				var g=255-pixelData[4*i+1];
+				var b=255-pixelData[4*i+2];
+				pixelData[4*i+0]=r;
+				pixelData[4*i+1]=g;
+				pixelData[4*i+2]=b;
+			}
+		contextb.putImageData(imageData,0,0,0,0,canvasa.width,canvasa.height);
+	}
+	//模糊滤镜
+	function blur(){
+		//参照数据，作为参照物，对另一个数据修改
+		var tmpData=contexta.getImageData(0,0,canvasa.width,canvasa.height);
+		var tmpPixelData=tmpData.data;
+		
+		var imageData=contexta.getImageData(0,0,canvasa.width,canvasa.height);
+		var pixelData=imageData.data;
+		var blurR=3;//模糊半径
+		var totalNum=(2*blurR+1)*(2*blurR+1);
+		//避免第一个像素点会发生数组越界问题，从1开始计数
+		for(var i=blurR;i<canvasb.height-blurR;i++)
+			{
+				for(var j=blurR;j<canvasb.width-blurR;j++)
+				{
+					//求出该像素点周围8个像素加上自己的rgb的总和
+					var totalR=0,totalG=0,totalB=0;
+					for(var dx=-blurR;dx<=blurR;dx++)
+						{
+							for(var dy=-blurR;dy<=blurR;dy++)
+								{
+									var x=i+dx;
+									var y=j+dy;
+									//将二维坐标转换为一维坐标
+									var p=canvasb.width*x+y;
+									totalR+=tmpPixelData[p*4+0];
+									totalG+=tmpPixelData[p*4+1];
+									totalB+=tmpPixelData[p*4+2];
+								}
+						}
+					var q=canvasb.width*i+j;
+					pixelData[4*q+0]=totalR/totalNum;
+					pixelData[4*q+1]=totalG/totalNum;
+					pixelData[4*q+2]=totalB/totalNum;
+				}
+			}
+		contextb.putImageData(imageData,0,0,0,0,canvasb.width,canvasb.height);
+	}
+		//马赛克滤镜
+	function mosaic(){
+		//参照数据，作为参照物，对另一个数据修改
+		var tmpData=contexta.getImageData(0,0,canvasa.width,canvasa.height);
+		var tmpPixelData=tmpData.data;
+		
+		var imageData=contexta.getImageData(0,0,canvasa.width,canvasa.height);
+		var pixelData=imageData.data;
+		var size=8;//模糊半径
+		var totalNum=size*size;
+		//避免第一个像素点会发生数组越界问题，从1开始计数
+		for(var i=0;i<canvasb.height;i+=size)
+			{
+				for(var j=0;j<canvasb.width;j+=size)
+				{
+					//求出该像素点周围8个像素加上自己的rgb的总和
+					var totalR=0,totalG=0,totalB=0;
+					for(var dx=0;dx<size;dx++)
+						{
+							for(var dy=0;dy<size;dy++)
+								{
+									var x=i+dx;
+									var y=j+dy;
+									//将二维坐标转换为一维坐标
+									var p=canvasb.width*x+y;
+									totalR+=tmpPixelData[p*4+0];
+									totalG+=tmpPixelData[p*4+1];
+									totalB+=tmpPixelData[p*4+2];
+								}
+						}
+					var q=canvasb.width*i+j;
+					var newr=totalR/totalNum;
+					var newg=totalG/totalNum;
+					var newb=totalB/totalNum;
+					for(var dx=0;dx<size;dx++)
+						{
+							for(var dy=0;dy<size;dy++)
+								{
+									var x=i+dx;
+									var y=j+dy;
+									//将二维坐标转换为一维坐标
+									var p=canvasb.width*x+y;
+									pixelData[p*4+0]=newr;
+									pixelData[p*4+1]=newg;
+									pixelData[p*4+2]=newb;
+								}
+						}
+				}
+			}
+		contextb.putImageData(imageData,0,0,0,0,canvasb.width,canvasb.height);
+	}
+</script>
+</body>
+</html>
